@@ -50,16 +50,19 @@ export default async (req:NextApiRequest, res:NextApiResponse) => {
         }
 
         const striperCheckoutSession = await stripe.checkout.sessions.create({
-            customer: customerId,
-            payment_method_types: ['card'],
-            billing_address_collection: 'required',
-            line_items: [
-                {price: 'price_1ItF8gDBsO7cZmwjzTnKg8T1', quantity: 1}
+            customer: customerId, // cliente que compra o produto. Devemos passar o id do cliente dentro do stripe. 
+            payment_method_types: ['card'], // meios de pagamento, vamos aceitar apenas card
+            billing_address_collection: 'required', // obrigar o usuário a preencher o endereço
+            line_items: [ // itens que eu quero no vetor
+                {   
+                    price: 'price_1ItF8gDBsO7cZmwjzTnKg8T1', // id do preço cadastrado no stripe
+                    quantity: 1 // quantidade 
+                }
             ],
-            mode: 'subscription',
-            allow_promotion_codes: true,
-            success_url: process.env.STRIPE_SUCCESS_URL,
-            cancel_url: process.env.STRIPE_CANCEL_URL,
+            mode: 'subscription', // pagamento recorrente
+            allow_promotion_codes: true, // permitir desconto
+            success_url: process.env.STRIPE_SUCCESS_URL, // redirecionamento caso sucesso
+            cancel_url: process.env.STRIPE_CANCEL_URL, // redirecioanemtno caso cancelar a requisição
         });
 
         return res.status(200).json({sessionId: striperCheckoutSession.id});
